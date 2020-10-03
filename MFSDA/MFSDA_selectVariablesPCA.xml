@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Shape Analysis.Advanced</category>
+  <title>MFSDA_selectVariablesPCA</title>
+  <description><![CDATA[This provides a commandline interface to run MFSDA_selectVariablesPCA.]]></description>
+  <version>1.0.0</version>
+
+
+  <contributor>Loic Michoud,Mateo Lopez (UNC)</contributor>
+
+  <parameters>
+    <label>IO</label>
+    <description>Inputs parameters</description>
+    <file fileExtensions=".csv">
+      <name>csv</name>
+      <longflag>csv</longflag>
+      <label>Covariate csv file</label>
+      <channel>input</channel>
+      <description>Table of covariates ex. age gender group veCadherinP</description>
+    </file>
+    <integer>
+      <name>num_components</name>
+      <longflag>num_components</longflag>
+      <label>Number of components</label>
+      <channel>input</channel>
+      <description>Number of principal components for pearson correlation analysis</description>
+    </integer>
+    <directory>
+      <name>output</name>
+      <longflag>output</longflag>
+      <label>Output Directory</label>
+      <channel>output</channel>
+      <description>output shape</description>
+      <default>./out</default>
+    </directory>
+  </parameters>
+</executable>
+
