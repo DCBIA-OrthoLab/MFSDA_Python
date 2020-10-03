@@ -12,8 +12,10 @@ The hypothesis testing results are further used in clustering based analysis, i.
 
 ### Loadable module
 
-The project a Slicer loadable allowing to XXX that internally leverage invokes command line modules described below.
+![MFSDA UI](MFSDA/Resources/Icons/RunMFSDA.png)
 
+The project loadable module allowing MFSDA to invoke the command line module MFSDA_run
+and MFSDA_createShapes. More details below. 
 
 ### CLI modules
 
@@ -23,20 +25,20 @@ The project a Slicer loadable allowing to XXX that internally leverage invokes c
 | [MFSDA_run][MFSDA_run]                               | Main script to run the Multivariate Funcional Shape Data Analysis |
 | [MFSDA_createShapes][MFSDA_createShapes]             | After completion, add the pvalues/efit to a shape for visualization|
 
-
-
 [MFSDA_createShapes]: https://github.com/DCBIA-OrthoLab/MFSDA_Python/blob/master/MFSDA/MFSDA_createShapes.xml
 [MFSDA_run]: https://github.com/DCBIA-OrthoLab/MFSDA_Python/blob/master/MFSDA/MFSDA_run.xml
 [MFSDA_selectVariablesPCA]: https://github.com/DCBIA-OrthoLab/MFSDA_Python/blob/master/MFSDA/Resources/Libraries/MFSDA_selectVariablesPCA.py
 
 #### MFSDA_selectVariablesPCA.py
 
-Helper script for variable selection using pearson correlations with principal components (PCA).
+![Variable selection UI](MFSDA/Resources/Icons/SelectVariables.png)
+
+Helper script for variable selection using pearson correlations with the principal components (PCA).
 Runs PCA in the dataset and selects the first 'n' first principal components. 
 A correlation analysis is done with each variable in the dataset and the principal components.
-This analysis will give you an idea how correlated each variable is to the principal component, in other words, 
-how much does each variable contribute to the principal components. Ideally, when running MFSDA, you should select variables 
-that are not correlated or select variables that contribute to different principal components. 
+This analysis will give you an idea of how correlated each variable is to the first 'n' principal components, in other words, 
+how much does each variable contribute to a principal components. Ideally, when running MFSDA, you should select variables 
+that are not correlated between each other or select variables that contribute to different principal components. 
 
 ##### Required inputs
 
