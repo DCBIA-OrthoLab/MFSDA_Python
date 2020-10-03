@@ -1,3 +1,5 @@
+#!/usr/bin/env python-real
+# -*- coding: utf-8 -*-
 from __future__ import print_function
 from sklearn.decomposition import PCA
 import pandas as pd
