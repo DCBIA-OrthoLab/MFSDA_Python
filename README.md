@@ -100,6 +100,13 @@ Covariate names, ex. '--covariates age gender group var1'. These names are used 
 
 Output vtk file. 
 
+## License
+
+It is covered by the Apache License, Version 2.0:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+The license file was added at revision 2aa1467f on 2020-12-10, but you may consider that the license applies to all prior revisions as well.
 
 ## History
 
