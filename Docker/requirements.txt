@@ -1,0 +1,4 @@
+scipy
+statsmodels
+scikit-learn
+vtk == 9.1.0
