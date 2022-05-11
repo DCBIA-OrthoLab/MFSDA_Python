@@ -37,6 +37,7 @@ def main():
 
 def run_pc_score(args):
     covariates_sa = pd.read_csv(args.csv)
+    covariates_sa = covariates_sa._get_numeric_data()
     covariates = np.array(covariates_sa.axes[1])
     if type(covariates[0]) == str:
         covariates_sa = pd.read_csv(args.csv, usecols=covariates)
