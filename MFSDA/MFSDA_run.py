@@ -24,12 +24,14 @@ import vtk
 import argparse
 import os
 import json
+import pandas as pd
 
 """installed all the libraries above"""
 
 def main():
     parser = argparse.ArgumentParser(description='Multivariate Functional Shape Data Analysis (MFSDA)')
     parser.add_argument('--shapeData', type=str, help='Text file list with vtk filenames, 1 file per line', required=True)
+    parser.add_argument('--covariates', type=str, nargs='+', help='name of covariates. If not specified, the csv must not have a header', default=None)
     parser.add_argument('--coordData', type=str, help='filename, .vtk shape template', required=True)
     parser.add_argument('--outputDir', help='output directory', default='./output')
 
@@ -49,46 +51,88 @@ def run_script(args):
     """Step 1. load dataset """
 
     print("loading data ......")
-    print("+++++++Read the surface shape data+++++++")    
+    print("+++++++Read the surface shape data+++++++")
 
-    fh = open(args.shapeData, 'rU')     
+    if args.covariates:
 
-    y_design = []
-    nshape = 0
-    numpoints = -1
+        df = pd.read_csv(args.shapeData)
+        
 
-    header = fh.readline()
-    toks = header.split(sep=',')
-    covs_tmp = []
+        y_design = []
+        nshape = 0
+        numpoints = -1
 
-    for line in fh.readlines():
-        toks = line.strip().split(sep=',')
+        for ids, row in df.iterrows():
+            vtkfilename = row['file']
 
-        # Read VTK file
-        vtkfilename = toks[0].rstrip()
-        print("Reading {}".format(vtkfilename))
-        reader = vtk.vtkPolyDataReader()
-        reader.SetFileName(vtkfilename)
-        reader.Update()
-        shapedata = reader.GetOutput()
-        shapedatapoints = shapedata.GetPoints()
+            print("Reading {}".format(vtkfilename))
+            reader = vtk.vtkPolyDataReader()
+            reader.SetFileName(vtkfilename)
+            reader.Update()
 
-        y_design.append([])
+            shapedata = reader.GetOutput()
+            shapedatapoints = shapedata.GetPoints()
 
-        if numpoints == -1:
-            numpoints = shapedatapoints.GetNumberOfPoints()
+            y_design.append([])
 
-        if numpoints != shapedatapoints.GetNumberOfPoints():
-            print("WARNING! The number of points is not the same for the shape:", vtkfilename)
+            if numpoints == -1:
+                numpoints = shapedatapoints.GetNumberOfPoints()
 
-        for i in range(shapedatapoints.GetNumberOfPoints()):
-            p = shapedatapoints.GetPoint(i)
-            y_design[nshape].append(p)
+            if numpoints != shapedatapoints.GetNumberOfPoints():
+                print("WARNING! The number of points is not the same for the shape:", vtkfilename)
 
-        nshape += 1
+            for i in range(shapedatapoints.GetNumberOfPoints()):
+                p = shapedatapoints.GetPoint(i)
+                y_design[nshape].append(p)
 
-        # Build covariate matrix
-        covs_tmp.append(toks[1:])
+            nshape += 1
+
+            # Build covariate matrix
+            for cov in args.covariates:
+                if cov in df.columns:
+                    covs_tmp.append(row[cov])
+                else:
+                    print("ERROR! The name", cov, "is not a covariate in the CSV", file=sys.stderr)
+
+    else:
+        fh = open(args.shapeData, 'rU')     
+
+        y_design = []
+        nshape = 0
+        numpoints = -1
+
+        header = fh.readline()
+        toks = header.split(sep=',')
+        covs_tmp = []
+
+        for line in fh.readlines():
+            toks = line.strip().split(sep=',')
+
+            # Read VTK file
+            vtkfilename = toks[0].rstrip()
+            print("Reading {}".format(vtkfilename))
+            reader = vtk.vtkPolyDataReader()
+            reader.SetFileName(vtkfilename)
+            reader.Update()
+            shapedata = reader.GetOutput()
+            shapedatapoints = shapedata.GetPoints()
+
+            y_design.append([])
+
+            if numpoints == -1:
+                numpoints = shapedatapoints.GetNumberOfPoints()
+
+            if numpoints != shapedatapoints.GetNumberOfPoints():
+                print("WARNING! The number of points is not the same for the shape:", vtkfilename)
+
+            for i in range(shapedatapoints.GetNumberOfPoints()):
+                p = shapedatapoints.GetPoint(i)
+                y_design[nshape].append(p)
+
+            nshape += 1
+
+            # Build covariate matrix
+            covs_tmp.append(toks[1:])
 
     y_design = np.array(y_design)
     y_design.reshape(nshape, numpoints, 3)
