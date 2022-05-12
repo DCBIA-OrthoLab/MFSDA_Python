@@ -88,6 +88,11 @@ def run_script(args):
             nshape += 1
 
             # Build covariate matrix
+            if args.covariates == ["all"]:
+                for cov in df.columns:
+                    if cov != "patientId" or cov != "file":
+                        covs_tmp.append(row[cov])
+
             for cov in args.covariates:
                 if cov in df.columns:
                     covs_tmp.append(row[cov])
