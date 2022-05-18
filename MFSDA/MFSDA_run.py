@@ -62,6 +62,7 @@ def run_script(args):
         y_design = []
         nshape = 0
         numpoints = -1
+        covs_tmp = []
 
         for ids, row in df.iterrows():
             vtkfilename = row['file']
