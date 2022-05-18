@@ -34,6 +34,7 @@ def main():
     parser.add_argument('--covariates', type=str, nargs='+', help='name of covariates. If not specified, the csv must not have a header', default=None)
     parser.add_argument('--coordData', type=str, help='filename, .vtk shape template', required=True)
     parser.add_argument('--outputDir', help='output directory', default='./output')
+    parser.add_argument('--appendCSVDir', type=str, help='Append the CSV directory to read the shape data', default=False)
 
     args = parser.parse_args()
 
@@ -64,6 +65,8 @@ def run_script(args):
 
         for ids, row in df.iterrows():
             vtkfilename = row['file']
+            if(args.appendCSVDir):
+                vtkfilename = os.path.join(os.path.dirname(args.shapeData), vtkfilename)
 
             print("Reading {}".format(vtkfilename))
             reader = vtk.vtkPolyDataReader()
