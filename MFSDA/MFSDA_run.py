@@ -57,6 +57,11 @@ def run_script(args):
     if args.covariates:
 
         df = pd.read_csv(args.shapeData)
+
+        if args.covariates == ["all"]:
+            covariates = df._get_numeric_data()
+        else:
+            covariates = args.covariates
         
 
         y_design = []
@@ -92,16 +97,12 @@ def run_script(args):
             nshape += 1
 
             # Build covariate matrix
-            if args.covariates == ["all"]:
-                for cov in df.columns:
-                    if cov != "patientId" or cov != "file":
-                        covs_tmp.append(row[cov])
+            
+            covs = []
+            for cov in covariates:
+                covs.append(row[cov])
 
-            for cov in args.covariates:
-                if cov in df.columns:
-                    covs_tmp.append(row[cov])
-                else:
-                    print("ERROR! The name", cov, "is not a covariate in the CSV", file=sys.stderr)
+            covs_tmp.append(covs)
 
     else:
         fh = open(args.shapeData, 'rU')     
