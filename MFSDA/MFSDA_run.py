@@ -30,8 +30,8 @@ import pandas as pd
 
 def main():
     parser = argparse.ArgumentParser(description='Multivariate Functional Shape Data Analysis (MFSDA)')
-    parser.add_argument('--shapeData', type=str, help='Text file list with vtk filenames, 1 file per line', required=True)
-    parser.add_argument('--covariates', type=str, nargs='+', help='name of covariates. If not specified, the csv must not have a header', default=None)
+    parser.add_argument('--shapeData', type=str, help='Text file list with vtk filenames, 1 file per line, comma separated table with covariates', required=True)
+    parser.add_argument('--covariates', type=str, nargs='+', help='name of covariates. If specified, the csv must not have a header', default=None)
     parser.add_argument('--coordData', type=str, help='filename, .vtk shape template', required=True)
     parser.add_argument('--outputDir', help='output directory', default='./output')
     parser.add_argument('--appendCSVDir', type=str, help='Append the CSV directory to read the shape data', default=False)
@@ -44,6 +44,23 @@ def main():
     delta_time_all = str(stop_all - start_all)
     print("The total elapsed time is " + delta_time_all)
 
+def getCovariateType(design_data):
+
+    (row,column)=design_data.shape
+    cov_types=[]
+    for c in range(column):
+        cov_col=design_data[:,c]
+        cov_type = 0. #int
+        for i in range(len(cov_col)):
+            if int(cov_col[i])!=cov_col[i]:
+                cov_type = 1. #double
+                break
+        cov_types.append(cov_type)
+
+    cov_types = np.array(cov_types)
+    return cov_types
+
+
 def run_script(args):
     """
     Run the commandline script for MFSDA.
@@ -54,15 +71,11 @@ def run_script(args):
     print("loading data ......")
     print("+++++++Read the surface shape data+++++++")
 
-    if args.covariates:
+    if args.covariates is None:
 
         df = pd.read_csv(args.shapeData)
-
-        if args.covariates == ["all"]:
-            covariates = df._get_numeric_data()
-        else:
-            covariates = args.covariates
         
+        covariates = list(df._get_numeric_data())
 
         y_design = []
         nshape = 0
@@ -191,6 +204,9 @@ def run_script(args):
     pvalues['clu_pvals'] = clu_pvals.tolist()
     pvalues['Lpvals_fdr'] = lpvals_fdr.tolist()
 
+    if args.covariates is None:
+        pvalues['covariates'] = covariates
+
     with open(os.path.join(args.outputDir,'pvalues.json'), 'w') as outfile:
         json.dump(pvalues, outfile)
 
@@ -199,25 +215,11 @@ def run_script(args):
     efit['efitYdesign'] = efity_design.tolist()
     efit['efitEtas'] = efit_eta.tolist()
 
+    if args.covariates is None:
+        efit['covariates'] = covariates
+
     with open(os.path.join(args.outputDir,'efit.json'), 'w') as outfile:
         json.dump(efit, outfile)
-
-
-def getCovariateType(design_data):
-
-    (row,column)=design_data.shape
-    cov_types=[]
-    for c in range(column):
-        cov_col=design_data[:,c]
-        cov_type = 0. #int
-        for i in range(len(cov_col)):
-            if int(cov_col[i])!=cov_col[i]:
-                cov_type = 1. #double
-                break
-        cov_types.append(cov_type)
-
-    cov_types = np.array(cov_types)
-    return cov_types
 
 
 if __name__ == '__main__':

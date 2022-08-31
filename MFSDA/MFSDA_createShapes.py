@@ -14,7 +14,7 @@ def main():
     parser.add_argument('--shape', type=str, help='Shape data', required=True)
     parser.add_argument('--pvalues', type=str, help='filename, .json with pvalues', required=True)
     parser.add_argument('--efit', type=str, help='filename, .json with efit', required=True)
-    parser.add_argument('--covariates', nargs='+', type=str, help='vector of covariate names, ex. age gender group veCadherinP')
+    parser.add_argument('--covariates', nargs='+', type=str, help='vector of covariate names, ex. age gender group veCadherinP', default=None)
     parser.add_argument('--output', help='output shape', default='out.vtk')
 
     args = parser.parse_args()
@@ -32,9 +32,11 @@ def run_script(args):
         efit = json.load(data_file)
         efitbetas = np.array(efit['efitBetas'])
 
-    covariates = []
-    if args.covariates:
-        covariates = args.covariates[0].split()
+    covariates = None
+    if 'covariates' in pvalues and args.covariates is None:
+        covariates = pvalues['covariates']
+    elif args.covariates:
+        covariates = args.covariates
 
     reader = vtk.vtkPolyDataReader()
     reader.SetFileName(args.shape)
@@ -49,7 +51,7 @@ def run_script(args):
 
         arr = vtk.vtkDoubleArray()
         name = 'pvalue_'
-        if covariates and j < len(covariates):
+        if covariates is not None and j < len(covariates):
             name += covariates[j]
         else:
             name += str(j)
@@ -68,7 +70,7 @@ def run_script(args):
 
             name = 'betavalues_' + str(k) + "_"
 
-            if covariates and i < len(covariates):
+            if covariates is not None and i < len(covariates):
                 name += covariates[i]
             else:
                 name += str(i)
